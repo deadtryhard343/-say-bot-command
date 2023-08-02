@@ -1,4 +1,3 @@
-// stats.js
 const { version: discordVersion, ClientUser } = require('discord.js');
 const { version: nodeVersion } = require('process');
 
