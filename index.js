@@ -1,37 +1,59 @@
+// index.js
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
-const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+const path = require('path');
 
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
+const TOKEN = 'MTEyOTY1MTc2NzE2OTI2MTYxMA.GcJc0S.4zJZ74ITge5T6Z_VNdcdsS7X99NyykcNib9jPw'; // Replace with your bot token
+const PREFIX = '!';
 
-// Read the command files and add them to the collection
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.name, command);
-}
-
-client.once('ready', () => {
-  console.log('Ready!');
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
-client.on('message', message => {
-  if (!message.content.startsWith(prefix) || message.author.bot) return;
+// Create a collection to store the commands
+client.commands = new Collection();
 
-  const args = message.content.slice(prefix.length).trim().split(/ +/);
+client.once('ready', () => {
+  console.log(`Logged in as ${client.user.tag}`);
+});
+
+// Load commands dynamically from the 'commands' folder
+const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+  const command = require(path.join(__dirname, 'commands', file));
+  client.commands.set(command.name, command);
+
+  // Ensure the description is set for each command
+  if (!command.description) {
+    command.description = 'No description available.';
+  }
+}
+
+// Export the PREFIX and client so they can be used in other files
+module.exports = {
+  client,
+  PREFIX,
+};
+
+client.on('messageCreate', async (message) => {
+  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
+
+  const args = message.content.slice(PREFIX.length).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
 
-  if (!client.commands.has(commandName)) return;
-
   const command = client.commands.get(commandName);
+  if (!command) return;
 
   try {
     command.execute(message, args);
   } catch (error) {
     console.error(error);
-    message.reply('There was an error while executing this command.');
+    message.reply('An error occurred while executing the command.');
   }
 });
 
-client.login(token);
+client.login(TOKEN);
