@@ -1,36 +1,46 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 
-const TOKEN = 'YOUR_BOT_TOKEN';   //Put your bot token there between the '
-const PREFIX = '!'; // Replace '!' with your desired prefix
+const TOKEN = 'YOUR_BOT_TOKEN';
+const PREFIX = '!';
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent, //join the support server if you need help!!  https://discord.gg/H2czZSKCKa
+    GatewayIntentBits.MessageContent,
   ],
 });
+
+// Create a collection to store the commands
+client.commands = new Collection();
 
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
+// Load commands dynamically from the 'commands' folder
+const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+  const command = require(path.join(__dirname, 'commands', file));
+  client.commands.set(command.name, command);
+}
+
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;
 
   const args = message.content.slice(PREFIX.length).trim().split(/ +/);
-  const command = args.shift().toLowerCase();
+  const commandName = args.shift().toLowerCase();
 
-  if (command === 'say') {
-    const text = args.join(' ');
-    if (!text) {
-      await message.reply('Please provide some text for me to say!');
-    } else {
-      await message.channel.send(text);
+  const command = client.commands.get(commandName);
+  if (!command) return;
 
-      // Delete the command message after executing the command, Needs manage messege perms
-      message.delete().catch(console.error);
-    }
+  try {
+    command.execute(message, args);
+  } catch (error) {
+    console.error(error);
+    message.reply('An error occurred while executing the command.');
   }
 });
 
