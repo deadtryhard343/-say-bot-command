@@ -8,7 +8,7 @@ module.exports = {
   
       const member = message.mentions.members.first();
       if (!member) {
-        return message.reply('Please mention a user to ban.');
+        return message.reply('Please mention a user to ban.'); 
       }
   
       if (!member.bannable) {
