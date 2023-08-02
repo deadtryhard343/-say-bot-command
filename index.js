@@ -1,8 +1,9 @@
+// index.js
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
-const TOKEN = 'YOUR_BOT_TOKEN_HERE'; // Replace with your bot token
+const TOKEN = 'YOUR_BOT_TOKEN_HERE';
 const PREFIX = '!';
 
 const client = new Client({
@@ -25,18 +26,7 @@ const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(fil
 for (const file of commandFiles) {
   const command = require(path.join(__dirname, 'commands', file));
   client.commands.set(command.name, command);
-
-  // Ensure the description is set for each command
-  if (!command.description) {
-    command.description = 'No description available.';
-  }
 }
-
-// Export the PREFIX and client so they can be used in other files
-module.exports = {
-  client,
-  PREFIX,
-};
 
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;
@@ -48,7 +38,7 @@ client.on('messageCreate', async (message) => {
   if (!command) return;
 
   try {
-    command.execute(message, args);
+    command.execute(message, args, PREFIX); // Pass PREFIX as a parameter
   } catch (error) {
     console.error(error);
     message.reply('An error occurred while executing the command.');
@@ -56,3 +46,6 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(TOKEN);
+
+// Export the client so it can be used in other files
+module.exports = client;
