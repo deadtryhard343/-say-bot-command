@@ -1,47 +1,37 @@
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
-const path = require('path');
+const Discord = require('discord.js');
+const { prefix, token } = require('./config.json');
 
-const TOKEN = 'YOUR_BOT_TOKEN';
-const PREFIX = '!';
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
 
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
-});
-
-// Create a collection to store the commands
-client.commands = new Collection();
-
-client.once('ready', () => {
-  console.log(`Logged in as ${client.user.tag}`);
-});
-
-// Load commands dynamically from the 'commands' folder
-const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
+// Read the command files and add them to the collection
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
-  const command = require(path.join(__dirname, 'commands', file));
+  const command = require(`./commands/${file}`);
   client.commands.set(command.name, command);
 }
 
-client.on('messageCreate', async (message) => {
-  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
+client.once('ready', () => {
+  console.log('Ready!');
+});
 
-  const args = message.content.slice(PREFIX.length).trim().split(/ +/);
+client.on('message', message => {
+  if (!message.content.startsWith(prefix) || message.author.bot) return;
+
+  const args = message.content.slice(prefix.length).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
 
+  if (!client.commands.has(commandName)) return;
+
   const command = client.commands.get(commandName);
-  if (!command) return;
 
   try {
     command.execute(message, args);
   } catch (error) {
     console.error(error);
-    message.reply('An error occurred while executing the command.');
+    message.reply('There was an error while executing this command.');
   }
 });
 
-client.login(TOKEN);
+client.login(token);
