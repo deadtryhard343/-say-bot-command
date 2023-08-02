@@ -1,7 +1,5 @@
 # Free-bot-with-commands
-A free discord code made by deadtryhard343. Commands are free to use and can be modifed or copied at will. I don't care what you use this for. I will add multiple commands to this soon
-As of now the bot has 1 command and it is !say
-!say <text> you can make the bot echo anything you say after the word !say and then it will delete it after so it only shows the bot message
+A free discord bot that has commands that are free to use! You can use this bot however you want it i dont care lol. This bot uses prefix comamnds!! You can change the prefix by editing your index.js file and changing the prefix command from the default ! to whatever you want
 
 Make sure you run npm i or npm install before using any of the code!
 Support server https://discord.gg/H2czZSKCKa
