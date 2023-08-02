@@ -6,3 +6,4 @@ do !help to see the list of commands once you setup the bot or look in the comma
 
 Make sure you run npm i or npm install before using any of the code!
 Support server https://discord.gg/H2czZSKCKa
+made by deadtryhard343 all rights reserved to deadtryhard343
