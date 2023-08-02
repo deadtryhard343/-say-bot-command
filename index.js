@@ -4,7 +4,7 @@ const path = require('path');
 
 const TOKEN = 'YOUR_BOT_TOKEN';
 const PREFIX = '!';
-//join the support server if you need help or want to suggest new stuff to this open source bot! https://discord.gg/H2czZSKCKa
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
