@@ -2,7 +2,7 @@ const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
-const TOKEN = 'YOUR_BOT_TOKEN';  
+const TOKEN = 'YOUR_BOT_TOKEN';
 const PREFIX = '!';
 
 const client = new Client({
